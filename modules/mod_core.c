@@ -5111,7 +5111,7 @@ MODRET core_dele(cmd_rec *cmd) {
 
 MODRET core_rnto(cmd_rec *cmd) {
   int res;
-  char *path;
+  char *path, *fullpath;
   unsigned char *allow_overwrite = NULL;
   struct stat st;
 
@@ -5239,6 +5239,20 @@ MODRET core_rnto(cmd_rec *cmd) {
       pr_log_debug(DEBUG0, "error unlinking '%s': %s", session.xfer.path,
         strerror(errno));
     }
+  }
+
+  /* patching it to log when ftp rnto, all the ftp rnto command would have a action_flags as r */
+  fullpath = dir_abs_path(cmd->tmp_pool, path, TRUE);
+
+  if (session.sf_flags & SF_ANON) {
+    xferlog_write(0, session.c->remote_name, 0, fullpath,
+      (session.sf_flags & SF_ASCII ? 'a' : 'b'), 'i', 'a', session.anon_user,
+      'c', "r");
+
+  } else {
+    xferlog_write(0, session.c->remote_name, 0, fullpath,
+      (session.sf_flags & SF_ASCII ? 'a' : 'b'), 'i', 'r', session.user, 'c',
+      "r");
   }
 
   /* Change the xfer path to the name of the destination file, for logging. */
