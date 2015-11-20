@@ -5241,18 +5241,18 @@ MODRET core_rnto(cmd_rec *cmd) {
     }
   }
 
-  /* patching it to log when ftp rnto, all the ftp rnto command would have a action_flags as r */
+  /* patching it to log when ftp rnto, all the ftp rnto command would have an action_flags as R */
   fullpath = dir_abs_path(cmd->tmp_pool, path, TRUE);
 
   if (session.sf_flags & SF_ANON) {
     xferlog_write(0, session.c->remote_name, 0, fullpath,
       (session.sf_flags & SF_ASCII ? 'a' : 'b'), 'i', 'a', session.anon_user,
-      'c', "r");
+      'c', "R");
 
   } else {
     xferlog_write(0, session.c->remote_name, 0, fullpath,
       (session.sf_flags & SF_ASCII ? 'a' : 'b'), 'i', 'r', session.user, 'c',
-      "r");
+      "R");
   }
 
   /* Change the xfer path to the name of the destination file, for logging. */
