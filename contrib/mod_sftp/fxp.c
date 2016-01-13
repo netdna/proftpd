@@ -9617,6 +9617,7 @@ static int fxp_handle_remove(struct fxp_packet *fxp) {
 static int fxp_handle_rename(struct fxp_packet *fxp) {
   unsigned char *buf, *ptr;
   char *args, *old_path, *new_path;
+  char *old_fullpath, *new_fullpath;
   const char *reason;
   uint32_t buflen, bufsz, flags, status_code;
   struct fxp_packet *resp;
@@ -9998,6 +9999,13 @@ static int fxp_handle_rename(struct fxp_packet *fxp) {
     /* No errors. */
     xerrno = errno = 0;
   }
+
+  /* let's log rename to xferlog before return */
+  old_fullpath = dir_abs_path(fxp->pool, old_path, TRUE);
+  new_fullpath = dir_abs_path(fxp->pool, new_path, TRUE);
+
+  xferlog_write(0, session.c->remote_name, 0, old_fullpath, 'b', 'i', 'r', session.user, 'c', "F");
+  xferlog_write(0, session.c->remote_name, 0, new_fullpath, 'b', 'i', 'r', session.user, 'c', "T");
 
   status_code = fxp_errno2status(xerrno, &reason);
 
